@@ -1,0 +1,1040 @@
+Functional Programming Paradigm
+
+    - To be regarded as functional, your function or method should call only those side-effecting library functions for which you can hide their nonfunctional behavior (that is, ensuring that any mutation they make on data structures is hidden from your caller, perhaps by copying first and by catching any exceptions they might raise).
+
+    - No mutating structure visible to callers, no I/O, no exceptions
+
+    - What is Referential Transparency?
+
+    A function consistently produces the same result given the same input, no matter where and when it’s invoked.
+
+    The restrictions on “no visible side-effects” (no mutating structure visible to callers, no I/O, no exceptions) encode the concept of referential transparency. A function is referentially transparent if it always returns the same result value when called with the same argument value. The method String.replace is referentially transparent because "raoul".replace('r', 'R') will always produce the same result (the method replace returns a new String with all lowercase 'r' replaced with uppercase 'R') rather than updating its this object so it can be considered a function.
+    It also explains why we don’t regard Random.nextInt as functional. In Java using a Scanner object to get the input from a user’s keyboard violates referential transparency because calling the method nextLine may produce a different result at each call.
+
+    - object-oriented view: everything is an object and programs operate by updating fields and calling methods that update their associated object.
+    At the other end of the spectrum lies the referentially transparent functional-programming style of no (visible) mutation.
+
+    (VERY IMP - pg 375) Pure functional programming languages typically don’t include iterative constructs like while and for loops. Why?
+    Because such constructs are often a hidden invitation to use mutation. For example, the condition in a while loop needs to be updated; otherwise the loop would execute zero or an infinite number of times.
+
+    Iterator<Apple> it = apples.iterator();
+    while (it.hasNext()) {
+        Apple apple = it.next(); // 'it' is outside the loop, but loop has to update it to make the condition work properly. This is against functional-style programming.
+        // ...
+    }
+
+    The guidance when writing Java 8 is that you can often replace iteration with streams to avoid mutation.
+
+
+    Advantage of method without side-effect (pure method) -
+        The good news is that components of systems that embrace this idea can use multicore parallelism without using locking, because the methods can no longer interfere with each other.
+
+        Suppose a function or method has no side effects, except for it incrementing a field just after entry and decrementing it just before exit.
+        From the point of view of a program consisting of a single thread, this method has no visible side effects and can be regarded as functional style.
+        On the other hand, if another thread could inspect the field—or worse could call the method concurrently—it wouldn’t be functional. You could hide this issue by wrapping the body of this method with a lock, and this would again enable you to argue that the method is functional. But in doing so you would have lost the ability to execute two calls to the method in parallel using two cores on your multicore processor.
+        Your side effect may not be visible to a program, but it’s visible to the programmer in terms of slower execution!
+
+
+    Qualities of Functional Programming: (Chapter 14 of Java 8 In Action Book)
+
+    - first-class functions
+    - higher order functions
+    - currying
+    - Immutable Data Structure
+    - Lazy Evaluation
+    - Chaining
+    - Composition
+
+Building Stream
+
+    Empty stream
+        Stream<String> emptyStream = Stream.empty()
+
+    From values
+        Stream<String> stream = Stream.of("s1","s2","s3")
+
+    From array
+        Stream<String> stream = Arrays.stream(arrayOfString)
+
+    From the file
+        Stream<String> lines = Files.lines(Paths.get("./MyJavaProject/src/java8/data.txt"), Charset.defaultCharset());
+
+    From collection
+        Stream<Integer> stream = list.stream();
+
+    From iterator
+        Iterator<Integer> iterator = list.iterator();
+
+        From Iterator, you need to create spliterator and using spliterator, you can create a stream.
+
+        Spliterator<Integer> spliterator = Spliterators.spliteratorUnknownSize(sourceIterator, Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.DISTINCT | Spliterator.ORDERED | Spliterator.SORTED |Spliterator.SIZED | Spliterator.SUBSIZED);
+
+        Stream<Integer> targetStream = StreamSupport.stream(spliterator, true);
+    
+
+Creating Infinite Streams
+
+    Stream.iterate(...) and Stream.generate(...)
+
+    Stream.iterate(0, n -> n + 2)  // it is just like reduce method going in infinite loop
+    .limit(10);
+
+    intStream.range(0, 10).map(n -> n+2) ---
+    using range is better than iterate because iterate works on objects, so if you use iterate over ints, there will a cost of unboxing for n+2 like operations and then converting back to Integer(boxing) for creating Stream<Integer>
+    Use iterate for real objects(not wrappers of primitives).
+
+
+    IntStream ones = IntStream.generate(() -> 1);   --- This will repeatedly generate 1 infinitely.
+    Stream.generate(Math::random).limit(5);
+
+Stateful Operations
+
+    Intermediate Operations
+
+        sorted, distinct - unbound (infinite) state
+        skip, limit - bounded state
+
+        Do not use parallel processing on stateful operations. To maintain the state correctly between many threads, it needs some kind of synchronization, which is expensive.
+
+        numbers.parallelStream().distinct()... ---- try to avoid
+        numbers.stream().distinct().parallelStream().... ---- good
+
+    Terminal Operations
+
+        reduce, sumIteratively, min, max etc are stateful, but their state is very small and bounded.
+
+count
+    stream.count() gives total number of elements in a stream.
+
+map and flatMap
+
+    Stream<U> map(Function<T,U>), Stream<U> flatMap(Function<T, Stream<U>>)
+
+Filtering operations
+
+    filter(predicate)
+    anyMatch(predicate), allMatch, noneMatch
+
+    Optional findAny(), findFirst()
+
+Operations taking Consumer as a parameter
+
+    void forEach(consumer)
+    void forEachOrdered(consumer)
+    Stream peek(consumer) --- peek returns a stream
+        Stream.of("AAA","BBB","CCC").parallel().forEach(s->System.out.print(s)); // CCCAAABBB order is not maintained in parallel processing
+        Stream.of("AAA","BBB","CCC").parallel().forEachOrdered(s->System.out.print(s));// AAABBBCCC order is always maintained in parallel processing
+
+
+
+
+reduce(initial value/seed/identity, BinaryOperator accumulator, BinaryOperator combiner) --- returns value
+reduce(initial value/seed/identity, BinaryOperator accumulator) --- returns value  --- same as reduce(identity,accumulator,accumulator) accumulator function is used for combiner also
+reduce(BinaryOperator accumulator)  --- returns Optional --- same as reduce(Optional.empty(),accumulator,accumulator)
+
+
+sum(), min(), max()
+
+    They are variant of reduce() only. They can be used on IntStream/LongStream/DoubleStream etc.
+
+    Integer result = numbers.stream().sum()
+    is same as
+    Integer result = numbers.stream().reduce(0, Integer::sum)
+    is same as
+    Integer result = numbers.stream().reduce(0, (n1,n2) -> n1+n2)
+
+
+    OptionalInt num = numbers.stream().min()
+    is same as
+    Optional<Integer> num = numbers.stream().reduce(Math::min) // See it uses reduce(accumulator) method, so it returns Optional
+
+
+    OptionalInt num = numbers.stream().max()
+    is same as
+    Optional<Integer> num = numbers.stream().reduce(Math::max) // See it uses reduce(accumulator) method, so it returns Optional
+
+Numeric Streams
+
+    IntStream/LongStream/DoubleStream
+
+        map vs mapToInt
+
+            When summation of two numbers are done, it needs to be done on primitives (ints and not Integers).
+            There is a cost of converting Integer to int (Unboxing) for summation and then Boxing again after summation is done.
+            If you see below reduce method, that is what exactly would happen.
+
+            Stream<Integer> stream = numbers.stream().map((n) -> n * n).reduce(0, (n1, n2) -> n1+n2);
+
+            To avoid the cost of Unboxing and Boxing during reduce operation for two numbers n1 and n2, you can just do that once before calling reduce.
+
+            IntStream stream = numbers.stream().mapToInt((n) -> n * n).sum()
+            Stream<Integer> stream = stream.boxed();
+
+        range(n1,n2), rangeClosed(n1,n2)
+
+            IntStream.range(0,10).filter(.....)
+            This is like for(int i=0; i<10; i++)
+
+            IntStream.rangeClosed(0,10).filter(.....)
+            This is like for(int i=0; i<=10; i++)
+
+
+Files utility
+
+    There are some utility methods in Files class that now returns Stream.
+
+    Stream<String> lines = Files.lines(Paths.get("./MyJavaProject/src/java8/data.txt"), Charset.defaultCharset());
+    //Stream<String[]> stream = lines.map(line -> line.split(" "));
+    Stream<String> stream = lines.flatMap(line -> Arrays.stream(line.split(" ")));
+    long uniqueWordCount = stream.distinct().count();
+
+collect method
+
+    collection.stream().collect(Collector)    --- Collector is an interface. This is the most row form. All other syntaxes get converted into this form eventually.
+    collection.stream().collect(supplier, accumulator and combiner)
+    collection.stream().collect(Collectors utility method)
+
+    Collector<T,A,R> is an interface. It has following methods
+
+        Supplier<A> supplier()
+        BiConsumer<A, T> accumulator()
+        BinaryOperator<A> combiner()
+        Function<A, R> finisher()
+        Set<Characteristics> characteristics()
+        // This method can create an instance of CollectorImpl
+        Collector<T, A, R> of(Supplier<A> supplier,
+                              BiConsumer<A, T> accumulator,
+                              BinaryOperator<A> combiner, --- useful for parallelism. accumulated result from two threads are combined by a combiner.
+                              Function<A, R> finisher, --- combined result can be transformed to some other type by finisher. It is optional.
+                              Characteristics... characteristics)
+
+
+        List collector = integerStream.collect(
+                                    ArrayList::new, // same as () -> new ArrayList<>()  --- identity list
+                                    List::add, // same as //(identityList,b) -> identityList.add(b)
+                                    List::addAll // same as (lists from thread1, list2 from thread2) -> {return list1.addAll(list2);}
+                            );
+        is same as
+        List collector = integerStream.collect(Collectors.toList());
+
+        Internally, it is converted to
+        List collector = integerStream.collect(
+                                                Collectors.new CollectorImpl<>(ArrayList::new,
+                                                                               List::add,
+                                                                               (left, right) -> { left.addAll(right); return left; },
+                                                                               Collector.Characteristics.IDENTITY_FINISH --- This will create result in a Finisher that just returns the output same as input. I don't see any API that let's you pass Finisher. May be it is just for Java's internal use.
+                                                                              )
+                                              );
+        Collectors Utility Methods
+
+            All utility methods of Collectors returns a Collector that will have a Supplier, Accumulator, Combiner, Finisher
+            stream.collect(Collector) method executes this collector
+
+            How collector is executed by a collect method?
+                Till stream ends {
+                    O identityResult = collector.supplier().get();
+                    collector.getAccumulator().apply(streamElement, identityResult); --- accumulator collects stream element into identityResult
+                }
+
+                See example in MyStreamReduceCollectGroupingByMappingEtcApi.java
+
+
+            - Reducing and summarizing
+                Collectors.reducing(BinaryOperator) or (identity, Function mapper, BinaryOperator op)
+                    It internally creates Collector only, which accepts identity element as Supplier that helps during parallel processing. As you know there is a difference between stream.collect(Collectors.reducing(...) and stream.reduce(...) methods when parallel processing happens.
+                Collectors.counting()
+                    It uses Collectors.reducing(0L, e -> 1L, Long::sum) internally
+                Collectors.minBy
+                    It uses Collectors.reducing(BinaryOperator.minBy(comparator)) internally
+                Collectors.maxBy
+                    It uses Collectors.reducing(BinaryOperator.maxBy(comparator)) internally
+
+                Collectors.summingInt  --- same as stream.mapToInt(...).sum(), which is same as stream.mapToInt(...).reduce(0, Integer::sum), but .collect never uses reduce internally. It always uses Collector interface.
+                Collectors.summingLong
+                Collectors.summingDouble
+
+                Collectors.averagingInt
+                Collectors.averagingLong
+                Collectors.averagingDouble
+
+                Collectors.comparingInt
+                Collectors.comparingLong
+                Collectors.comparingDouble
+
+                Collectors.summerizingInt - It takes ToIntFunction as a parameter that can convert passed object to int. It returns a Collector that has a Finisher IntSummaryStatistics. This Finisher just summarizes everything like sumIteratively, min, max, count etc.
+
+                Collectors.toList() // If you want Collectors to create a new linkedlist to collect elements.
+                Collectors.toCollection(() -> linkedlist) // if you want to use external linkedlist to collect elements. Try to avoid using this approach because it can create problems when you use Parallel stream when you try to mutate the same linkedlist shared between multiple threads. To understand it more, read Chapter 7's 7.1.3 section. Use first approach (toList()) which will create a new linkedlist for each thread and these lists from all threads will be combined in one at the end.
+                Collectors.toSet()
+                Collectors.toCollection(() -> set)
+
+                Collectors.joining(), Collectors.joining(delimiter) --- use 'Collectors.joining' instead of '.reduce("", (s1,s2) -> s1+s2)' because Collectors.joining uses StringBuilder to concatenate strings, where as reduce method doesn't.
+                    String shortMenu = menu.stream().map(Dish::getName).collect(Collectors.joining());
+                    String shortMenu = menu.stream().map(Dish::getName).collect(joining(", "));
+                
+                
+                Collectors.groupingBy
+
+                    Most Raw Syntax:
+
+                        Map<key, value> result =
+                        Collectors.groupingBy(Function, ---  to decide key of Map
+                                             Supplier, ---  supplier of identity map (default is () -> new HashMap())
+                                             Collector) ---  for collecting result as map's value (default is Collectors.toList()). (IMP) it can take any Collector instance returned by any utility method of Collectors class.
+
+
+					    (IMP) See example in MyStreamReduceCollectGroupingByMappingEtcApi.java
+
+                    Other Syntaxes:
+
+                        Collectors.groupingBy(Function)
+                            internally uses
+                        Collectors.groupingBy(Function, HashMap::new, Collectors.toList())
+
+                        Collectors.groupingBy(Function, mapping(Function, Collector)) --- mapping returns a Collector
+
+                            people.stream().collect(Collectors.groupingBy(Person::getCity))
+                            creates a Map<city, List<Person>>
+
+                            people.stream().collect(Collectors.groupingBy(Person::getCity, Collectors.mapping(Person::getLastName, toSet())));
+                            It creates a Map<city, Set<lastname>>
+					
+				Collectors.mappingBy
+
+					Collectors.mapping(Function mapper, Collector downstream)
+
+						Before calling Collector's accumulator, it transforms the accumulator's input using mapper function.
+
+						List<Integer> collectingAge2 = persons.stream()
+															  .collect(ArrayList<Integer>::new,
+																		(list, person) -> list.add(person.getAge()), // it is adding person's age 
+																		(list1, list2) -> list1.addAll(list2));
+						// is same as
+						List<Integer> collectingAge1 = persons.stream()
+															  .collect(Collectors.mapping(person -> person.getAge(), 
+															  							  Collectors.toList())
+															  		  );
+						
+
+                Collectors.partitioningBy(Predicate, Collector)
+                    It is same as groupingBy creating a Map<Boolean, ...>
+
+                Collectors.collectingAndThen(Collector<T,A,R>, Function<R,RR> finisher)
+                    performs an additional finishing transformation
+
+Parallel Stream
+
+    Parallel streams work under the hood by employing the fork/join framework introduced in Java 7
+
+    A parallel stream is a stream that splits its elements into multiple chunks, processing each chunk with a different thread. Thus, you can automatically partition the workload of a given operation on all the cores of your multicore processor and keep all of them equally busy.
+
+    You can keep changing from parallel to sequential and vice-versa like below, but....
+        stream.parallel() .filter(...).sequential().map(...).parallel().reduce();
+    But the tail call to parallel or sequential wins and affects the pipeline globally. In this example, the pipeline will be executed in parallel because that’s the tail call in the pipeline.
+
+
+    Configuring the thread pool used by parallel streams
+
+        Parallel streams internally use the default ForkJoinPool, which by default has as many threads as you have processors, as returned by Runtime.getRuntime().availableProcessors().
+        But you can change the size of this pool using the system property java.util.concurrent.ForkJoinPool.common.parallelism, as in the following example:
+
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "12");
+
+        This is a global setting, so it will affect all the parallel streams in your code. Conversely, it currently isn’t possible to specify this value for a single parallel stream. In general, having the size of the ForkJoinPool equal to the number of processors on your machine is a meaningful default, and we strongly suggest that you not modify it unless you have a very good reason for doing so.
+
+    When not to use Parallelism?
+
+        - For cases like stream.reduce(...) where identity passed to reduce method is shared by all threads.
+          you can use parallelism for stream.collect(Collector) safely.
+
+        - Watch out for boxing. Automatic boxing and unboxing operations can dramatically hurt performance. Java 8 includes primitive streams (IntStream, LongStream, and DoubleStream) to avoid such operations, so use them when possible.
+          See the difference between stream.iterate and instream.range
+
+        - Some operations naturally perform worse on a parallel stream than on a sequential stream.
+          In particular, operations such as limit and findFirst that rely on the order of the elements are expensive in a parallel stream. For example, findAny will perform better than findFirst because it isn’t constrained to operate in the encounter order. You can always turn an ordered stream into an unordered stream by invoking the method unordered on it. So, for instance, if you need N elements of your stream and you’re not necessarily interested in the first N ones, calling limit on an unordered parallel stream may execute more efficiently than on a stream with an encounter order (for example, when the source is a List).
+
+            e.g.
+            IntStream.range(0, n).parallel().filter(...).findFirst();
+            parallel() will create bunch of threads and split the elements to those threads.
+            filter will run in every thread.
+            At the end, each thread will submit its result to findFirst.
+            If stream is ordered, findFirst's job becomes more expensive because it literally has to wait for the first thread to finish and check its result before going to next.
+            So, to improve the performance, you can either use findAny or parallel().unordered().filter(...).findFirst() in which whichever thread finishes first will be observed for its result.
+
+        - Consider the total computational cost of the pipeline of operations performed by the stream. With N being the number of elements to be processed and Q the approximate cost of processing one of these elements through the stream pipeline, the productRecursively of N*Q gives a rough qualitative estimation of this cost. A higher value for Q implies a better chance of good performance when using a parallel stream.
+
+        - For a small amount of data, choosing a parallel stream is almost never a winning decision. The advantages of processing in parallel only a few elements aren’t enough to compensate for the additional cost introduced by the parallelization process.
+
+        - Take into account how well the data structure underlying the stream decomposes. For instance, an ArrayList can be split much more efficiently than a LinkedList, because the first can be evenly divided without traversing it, as it’s necessary to do with the second. Also, the primitive streams created with the range factory method can be decomposed quickly.
+
+                        Source              Decomposability
+                        ------              ---------------
+                        ArrayList           Excellent
+                        LinkedList          Poor
+                        IntStream.range     Excellent
+                        Stream.iterate      Poor
+                        HashSet             Good
+                        TreeSet             Good
+
+            Using ArrayList instead of LinkedList with Parallelization is better.
+
+            Using IntStream.range instead of Stream.iterate is better with Parallelization.
+                Stream<T> iterate(final T seed, final UnaryOperator<T> f)
+                IntStream range(int startInclusive, int endExclusive)
+
+                Using range is better than iterate because iterate works on objects, so if you use iterate over ints, there will a cost of unboxing for n+2 like operations and then converting back to Integer(boxing) for creating Stream<Integer>
+                Use iterate for real objects(not wrappers of primitives).
+
+        - Consider whether a terminal operation has a cheap or expensive deleteRootAndMergeItsLeftAndRight step (for example, the combiner method in a Collector). If this is expensive, then the cost caused by the combination of the partial results generated by each substream can outweigh the performance benefits of a parallel stream.
+
+        - Parallelism should not be used for undbounded stateful operations like stream.distinct, stream.sorted
+
+
+Power of Laziness
+
+    Chapter 9 and 14 of FunctionalProgrammingInJavaBook.java
+
+    1)
+        Supplier<Integer> from(int i) {
+            return from(i+1); ----- infinite loop
+        }
+
+        Any recursion can be converted to lazy call using a Supplier
+        Lazy evaluation is helpful when you don't have exit condition in recursive method and the caller of method has to decide the exit condition.
+
+        Supplier<Integer> from(int i) {
+            return () -> from(i + 1); ---- no recursion. Every call is returned back to client and client decides to make another call.
+        }
+
+        int i=0;
+        while(i < 10) { // caller of recursive 'from' method decides exit condition.
+            Supplier<Integer> res = from(i++);
+            System.out.println(res.get());
+        }
+
+
+        To fulfill the advantage of laziness, sometimes you may have to make class variable also lazy.
+
+        class Cons extends Stream<I> {
+            public Cons(I head, Supplier<Stream<I>> tail) {
+                this.head = head;
+                this.tail = tail; // This doesn't create (instantiate) an actual tail node for a stream until it is evaluated.
+            }
+
+            public Stream<I> getTail() { // until this method is called, actual tail node is not created and so memory is saved.
+                return tail.get();
+            }
+        }
+
+        public static Stream<Integer> from(int i) {
+            return new Cons(i, () -> from(i + 1)); // Wrapping recursive method by a Supplier (Better Approach)
+        }
+
+
+        Java 8 streams are often described as lazy. They’re lazy in one particular aspect: a stream behaves like a black box that can generate values on request.
+        When you apply a sequence of operations to a stream, these are merely saved up. Only when you apply a terminal operation to a stream is anything actually computed.
+        This has the great advantage when you apply several operations (perhaps a filter and a map followed by a terminal operation reduce) to a stream; then the stream has to be traversed only once instead of for each operation.
+
+    2)
+        TailCall<Integer> from(int i) {
+            if(i == 9) return TailCall.getFinalValueContainer(i);
+            return TailCall.getSupplierContainer(() -> from(i+1);
+        }
+
+        When there is an exit condition inside recursive method, you can wrap lazy call to recursive method with TailCall.
+        You cannot do it without exit condition because of the way TailCall is implemented. It will always get SupplierContainer back from recursive method and TailCall doesn't have exit condition.
+
+    (IMP) Rule of Thumb to stop blowing stack for infinite recursion:
+    If there is no exit condition inside recursive method, you can wrap recursive call with a Supplier (make it lazy call) and let caller decide the exit condition and calling the method again.
+    If there is an exit condition inside recursive method, you can make TailCall as the caller of the recursive method. Basic concept still remains same.
+
+    3) Making method parameters lazy
+       Look at Collectors' utility methods that creates a Collector for you.
+       It uses a Supplier to send the identity result.
+       Stream's collect method uses this identitySupplier.get() for each thread it spawns for parallelism. For each thread, a new identity element is used to aggregate its result.
+       This is different than Stream's reduce method that doesn't use supplier for identity result.
+                
+
+Spliterator
+    Internally, Java uses Spliterator to split the collection/map etc into chunks and based on your choice, it executes them in sequence or parallel.
+    You can also create a Stream with your own Spliterator with using StreamSupport.stream(spliterator, parallel=true/false) api.
+    Spliterator can directly be retrieved from a collection or from it iterator.
+
+
+Optional
+
+    Creating Optional object
+
+        Optional<Car> optCar = Optional.empty();
+        Optional<Car> optCar = Optional.of(car);   --- If car were null, a NullPointerException would be immediately thrown
+        Optional<Car> optCar = Optional.ofNullable(car); --- If car were null, the resulting Optional object would be empty.
+
+    How to start using Optional?
+
+         public class Person {
+            private Optional<Car> car;
+
+            public Optional<Car> getCar() {
+                return car;
+            }
+         }
+            // or alternatively
+         public class Person {
+            private Car car;
+
+            public Car getCar() {
+                return car;
+            }
+
+            public Optional<Car> getCarAsOptional() {   ------- this is how you can add a new method in legacy code and start using Optional as shown below
+                return Optional.ofNullable(car);
+            }
+         }
+
+        public class Car {
+            private Optional<Insurance> insurance;
+
+            public Optional<Insurance> getInsurance() {
+                return insurance;
+            }
+        }
+
+        public class Insurance {
+            private String name;
+
+            public String getName() {
+                return name;
+            }
+        }
+
+        public String getCarInsuranceName(Person person) {
+            String name =
+                    Optional.ofNullable(person)
+                    .flatMap(p -> p.getCar())  // p.getCar() returns Optional<Car>. So .map method will return Optional<Optional<Car>>. You cannot call getInsurance on Optional<Optional<Car>>. So, use flatMap that returns Optional<Car>.
+                    .flatMap(c -> c.getInsurance())
+                    .map(i -> i.getName())
+                    .orElse("Unknown")
+            return name;
+        }
+
+    Other methods
+
+        filter, isPresent
+
+            Optional<USB> maybeUSB = ...;
+            maybeUSB.filter(usb -> "3.0".equals(usb.getVersion())
+                    .ifPresent(() -> System.out.println("ok"));
+
+        get()   --- returns an actual value non-null/null
+
+        orElse(supplier returning default value), orElseGet(supplier returning default value), orElseThrow(supplier throwing an exception)
+
+
+    COMPREHENSION Pattern
+
+        Here, I have given an example with Optional object. Other example you can see in List.java.
+
+        When you have more than one Optional objects as inputs to some other method/function, then you can use 'Comprehension' pattern to produce an output.
+
+        As a general rule, you should always remember not to use optional.get() or getOrThrow() when using that value as an input to other method/function.
+        Instead use comprehension pattern as shown below because it ensures calling getSomething(...) method only if all required inputs to that method are not-null.
+
+
+           O output = ra.flatMap(a ->
+                                    rb.flatMap(b ->
+                                                rc.map(c -> getSomething(a, b, c))));
+
+           Optional<O> output = ra.flatMap(a ->
+                                              rb.flatMap(b ->
+                                                            rc.flatMap(c -> getSomething(a, b, c))));
+
+
+
+        You could do
+            O output = getSomething(ra.get(), rb.get(), rc.get()) which can potentially pass nulls to getSomething method, if you want to avoid that use comprehension pattern.
+
+            or
+
+            if(ra.get() != null) {
+                if(rb.get() != null) {
+                    if(rc.get() != null) {
+                         O output = getSomething(ra.get(), rb.get(), rc.get());
+                    }
+                }
+            }
+            which requires null checks
+
+        Both of these approaches are not good.
+
+
+        public static <A, B, C, D>
+            Function<Result<A>,Function<Result<B>,Function<Result<C>, Result<D>>>>     ------ chaining. client program can send a,b,c as input.
+            lift3(Function<A, Function<B, Function<C, D>>> f) {
+                // this is a simple method
+                return ra -> rb -> rc -> ra.flatMap(a -> rb.flatMap(b -> rc.map(c -> f.apply(a).apply(b).apply(c))));// using comprehension pattern
+                // or
+                //return ra -> rb -> rc -> ra.map(f).flatMap((f1) -> rb.map(f1)).flatMap((Function<Function<C, D>, Result<D>>) (f2) -> rc.map(f2));
+            }
+
+
+
+    Optional anti-pattern
+
+        https://dzone.com/articles/optional-anti-patterns
+
+        Anti-Pattern #1: Optional Types in Object Fields
+
+            public class Car {
+              private List<Wheel> wheels;
+              private Optional<Engine> engine;  --- Optional is not Serializable. So do not keep it as a property
+            }
+            you can do
+
+            public class Car {
+              private List<Wheel> wheels;
+              private Engine engine;
+
+              public Optional<Engine> getOptionalEngine() {
+                return Optional.ofNullable(engine);
+              }
+            }
+
+        Anti-Pattern #2: Collections of Optionals
+
+            private List<Optional<Wheel>> wheels;
+
+            There is no need to have List of Optionals that might or might not have a value. We can have a smaller or even empty List of concrete objects instead.
+
+        Anti-Pattern #3: Optional as a Method Argument
+
+            Long calculate(List<Optional<Long>> data)
+
+            Now let’s use this method:
+
+            List<Long> data = Arrays.asList(1L, 2L);
+            calculate(Optional.of(data));
+
+
+            Optional wraps objects with another level of abstraction, which, in that case, is simply extra boilerplate code. On the other hand, we have a cleaner solution without Optional.
+
+            List<Long> data = Arrays.asList(1L, 2L);
+            calculate(data);
+
+        Anti-Pattern #4: Trying to Serialize Optionals
+
+            Optionals were not designed to be serialized. Object serialization depends on object identity. If we take a look at the Javadocs, we can see that Optional was designed to be value-based:
+
+            "This is a value-based class; use of identity-sensitive operations (including reference equality (==), identity hash code, or synchronization) on instances of Optional may have unpredictable results and should be avoided"
+
+Higher order function
+
+    Function taking function(s) as arguments and/or returning a function is called higher order function.
+
+Function Chaining(Composing), Currying, Closure
+
+    Chaining:
+
+        In my opinion, chaining is something like below
+
+        class Stream {
+            Stream map(...);  // method returning same or another instance of the its containing class, so that another method can be called on the same instance
+            Stream filter(...);
+            ...
+        }
+        Stream stream = list.stream().flatMap(...).filter(...)...
+
+
+    Currying:
+
+        A method/function returning a Function is called curried method/function
+
+        e.g.
+        Function<I, Function<I,O>> --- function returning a function
+
+        Function<T, U> memoize(Function<T, U> function); --- functional method returning a function
+
+        When should Currying be used?
+
+            static double converter(double x, double f, double b) {
+                return x * f + b;
+            }
+
+            e.g. in this method, f and b remains same and based on changing x, you want to calculate the converted value.
+            It becomes tedious to pass f and b (non changing values) again and again to converter method and sometimes you can do mistake.
+
+            converter(10, 5, 6);
+            converter(20, 5, 6);
+            converter(30, 5, 6);
+
+            Here you should use currying.
+
+            static Function<Double> converter(double f, double b) {
+                return (x) -> x * f + b;
+            }
+
+            Function<Double> reusable = converter(5, 6);
+            resuable.apply(10);
+            reusable.apply(20);
+            reusable.apply(30);
+
+            Function<Double> anotherReusable = converter(6, 7);
+            resuable.apply(10);
+            reusable.apply(20);
+            reusable.apply(30);
+
+
+    Combination of both Chaining + Currying:
+
+        interface Function<T, R> {
+
+            default <V> Function<V, R> compose(Function<? super V, ? extends T> before) { // this method is returning a Function, so it is curried. But it is returning an instance of its containing class, so it is chaining also.
+                Objects.requireNonNull(before);
+                return (V v) -> apply(before.apply(v));
+            }
+
+        }
+
+    Advantages of Currying:
+
+        - Code Reuse. You can use it for different v (input) values.
+        - You can defer the execution of actual function at later point in time when you have an input value available.
+
+
+        Function<V, U> map(Function<V, U> functionConvertingVToU) {
+            return (v) -> functionConvertingVToU.apply(v);
+        }
+
+        map is a function that returns a Function. so, map is called a curried method.
+
+        Here, map is a "PARTIALLY APPLIED FUNCTION" because functionConvertingVToU needs V as an input, but it is not available it because we are not passing it to map.
+        In this situation, functionConvertingVToU cannot be evaluated fully. So, map becomes Partially Applied Function.
+        This forces us to return a Function from map method that takes required input parameters to evaluate functionConvertingVToU in future.
+
+        Function<String, Integer> functionConvertingVToU = (s) -> Integer.valueOf(s);
+        Function<String, Integer> partialResult = map(functionConvertingVToU);
+
+    Closure:
+
+         class A {
+
+            // This method returns a function (closureFun), but it is not a normal function It is a closure. 'closureFun' uses variable 'a', which is scoped outside of it in its enclosing context. That's why 'closureFun' is a closure function.
+            // In Java, closure function cannot use non-final variable from the enclosing context. So, Java's closure is a Partial Closure.
+            private Function<Integer, Integer> method() {
+
+                int a = 10;
+
+                Function<Integer, Integer> closureFun = new Function<> {
+                    @Override
+                    public Integer apply(Integer i1) {
+                        a = a * 2;  // not allowed because 'a' is a variable of enclosing context and it is not declared final.
+                        return a * i1;
+                    }
+                }
+
+                return closureFun; // closureFun is a closure because it uses a variable 'a' that is scoped in its enclosing context.
+            }
+         }
+
+         method().apply(5);
+
+         Lambda can use outside variables, so it is a closure, but it can access only final variables from outside (just like anonymous class). It cannot even change the value of outside variables because it considers them as final even though they are not declared as final.
+
+         private Function<Integer, Integer> method() {
+            int a = 10;
+            return (anotherNumber) -> a * anotherNumber; // this lambda is a closure because it uses it enclosing context's variable.
+         }
+
+How can you pass multiple parameters to a method?
+
+    e.g. you have below method
+
+    Function<T, U> method(Function<T, U> function) {
+        return (t) -> function.apply(t);
+    }
+
+    Function<Integer, Integer> function = method((t) -> t*10);
+
+    What if you want to pass 10 also as input to this method?
+
+    you have three choices:
+
+    Approach 1: Modify method code --- Not so good idea !!!
+
+        Function<T, Function<M, U>> method(Function<T, Function<M, U>> function) {
+            return (t, m) -> function.apply(t).apply(m);
+        }
+
+
+    Approach 2: Use Tuple as input that contains all the parameters that you need. --- Better idea
+
+        Function<Tuple, Integer> function = method((tuple) -> tuple.t * tuple.multiplicationFactor);
+
+        Tuple tuple = new Tuple(1, 10);
+        Integer result = function.apply(tuple);
+
+    Approach 3: No need to create Tuple. Use below approach. It is a bit complicated way, so try to avoid using it, but still understand it.
+
+        Function<Integer, Function<Integer, Integer>> function = method(t -> method(multiplicationFactor -> t * multiplicationFactor))
+        Integer result = function.apply(1).apply(10);
+
+
+Use of identity function
+
+    private List<Double> operation(List<Double> numbers, Function<Double, Double> finisher) {
+      List<Double> result = new ArrayList<>();
+
+      for (Double number : numbers) {
+         result.add(finisher.apply(number));
+      }
+
+      return result;
+    }
+
+    operation(Arrays.asList(10D, 4D, 12D), Function.<Double>identity()); // identity function usage
+
+    Similar approach is being used by Java's Collector. While creating CollectorImpl in Collectors, it passes identity function, if Characteristics is set as CH_ID.
+    So, Finisher will have no effect.
+
+Replacing if-else conditions using Matchers
+
+    See EmailValidation.java. It uses Matcher.java, CompositeMatchers.java.
+
+How to avoid side-effects from functional method/class?
+
+    Any class that follow below principles of not creating side-effects from its methods can be considered as functional class.
+
+    1. Use of Optional
+
+        public void method(...) {
+            throw new RuntimeException(...);
+        }
+
+        To make above method functional,
+
+        public Optional<RuntimeException> method(...) {
+            return Optional.of(exception);
+        }
+
+        public Optional<String> method(...) {
+            return Optional.of(exception.getMessage());
+        }
+
+        Or you can return a Consumer/Supplier that throws/supplies an exception.
+
+        public Consumer<RuntimeException> method(...) {
+            return (something) -> throw new RuntimeException(something);
+        }
+
+        public Supplier<RuntimeException> method(...) {
+            return () -> new RuntimeException(...);
+        }
+
+        - Returning null from a method is also harmful because you are forcing client to do a null check, which is bad.
+
+        public Person method(String name) {
+          if(name.equals(...)) return new Person(name);
+          return null;
+        }
+
+        This can improved as
+
+        public Optional<Person> method(String name) {
+          if(name.equals(...)) return Optional.of(new Person(name));
+          return Optional.empty();
+        }
+
+        See
+        AvoidAssertionNullChecksExceptions.java
+        PropertyReader.java
+
+    2. Use of Supplier
+
+        To make your method functional, your method should not create a side-effect. Side effect should be wrapped by a Supplier and method should return a Supplier and let caller create a side effect.
+
+        // This method has a side-effect of sending email and logging error. How to make it functional?
+        static void validate(String email) {
+            if (...some condition...) {
+              sendVerificationMail(email); // side effect
+            } else {
+              logError("email could not be sent to "+email); // side effect
+            }
+        }
+
+        static Supplier<String> validate(String email) {
+            return (...some condition...)
+                ? () -> sendVerificationMail(email) // overcoming side-effect from this method by wrapping a side-effect with a Consumer
+                : () -> logError("email could not be sent to "+email); // overcoming side-effect from this method by wrapping a side-effect with a Consumer
+
+        }
+
+
+        static void sayHello(String name) {
+           System.out.println("Hello, " + name + "!");
+        }
+
+        This method can be made functional as below
+
+        static Supplier<String> sayHello(String name) {
+            return () -> System.out.println("Hello, " + name + "!");
+        }
+
+    3. Use of Consumer
+
+        static void sayHello(String name) {
+           System.out.println("Hello, " + name + "!");
+        }
+
+        static Consumer<String> sayHello() {
+           return (name) -> System.out.println("Hello, " + name + "!");
+        }
+
+
+        Another Example:
+            EmailValidation.java - See how Matcher's result wrapped by a Consumer.
+
+    3. Use of Function
+
+        static void sayHello(String name) {
+           System.out.println("Hello, " + name + "!");
+        }
+
+        This method can be made functional as below
+
+        static Function<String, String>  sayHello() {
+            return (name) -> "Hello, " + name + "!";
+        }
+
+
+
+    Why logging inside a Function is non-functional?
+        Why logging is dangerous?
+        In functional programming, you will not see much logging. This is because functional programming makes logging mostly useless.
+        Functional programs are built by composing pure functions, meaning functions that always return the same value given the same argument. So there can’t be any surprises.
+        On the other hand, logging is ubiquitous in imperative programming because imperative programs are programs for which you can’t predict the output for a given input. Logging is like saying “I don’t know what the program might produce at this point, so I write it in a log file. If everything goes right, I will not need this log file. But if something goes wrong, I will be able to look at the logs to see what the program state was at this point.” This is nonsense.
+        In functional programing, there is no need for such logs. If all functions at correct, which can generally be proved, we don’t need to know the intermediate states. And furthermore, logging is often made conditional, which means that some logging code will only be executed in very rare and unknown states. This code is often untested. If you have ever seen a Java imperative program that worked fine in INFO mode suddenly break when run in TRACE mode, you know what I mean.
+
+    Other qualities of Functional Library(Class):  (See IO.java)
+
+        - Parameterized
+        - Should be able to have EMPTY instance
+        - Combinable - should have an add method (same as Java 8 Function's andThen method)
+        - should have map/flatMap methods
+        - Good to have
+            - unit method
+            - repeat method
+            - forever method  ---- Very interesting method. It shows how to tackle infinite recursive method calls.
+
+Advantages of Immutability
+
+    Mutable vs Immutable List and Tree
+
+        See Chapter 5 notes in FunctionalProgrammingInJavaBook.java for List and Chapter 10 for Tree.
+        List has a clear advantage of memory saving.
+        Tree has a clear advantage of simplifying recursion logic.
+        Immutability is very important to avoid concurrency problems also.
+
+
+Do not create methods taking Optional as parameter. Why?
+
+	Optional<String> decoratorMethod_1(String str) {
+		...
+		return Optional.ofNullable(newStr);
+	}
+
+	Optional<String> decoratorMethod_2_1(Optional<String> str) {
+		...
+		return Optional.ofNullable(newStr);
+	}
+
+	Optional<String> decoratorMethod_2_2(String str) {
+		...
+		return Optional.ofNullable(newStr);
+	}
+
+	Approach 1
+		Optional<String> newStr = decoratorMethod_1("abc");
+		newStr = decoratorMethod_2_1(newStr); // In this approach, you can't use Optional's method chaining, so you can't take the advantage of Comprehension pattern, if you need it.
+
+	Approach 2
+		Optional<String> newStr = decoratorMethod_1("abc");
+		newStr = newStr.flatMap(s -> decoratorMethod_2_2(s)); // As decoratorMethod_2_2 method is not taking Optional parameter, you can take the advantage of method chaining of Optional. You can ever take the advantage of Comprehension pattern, if you need it.
+
+
+Java 8 Map Enhancements
+
+    Java 8's map is enhanced to store a Tree (Red Black Tree) in-place of LinkedList, if number of elements that needs to be stored in a particular bucket is more than some number.
+    In worst case where all elements have same hash value need to be stored in same bucket of an array, searching an element in a linkedlist may take O(n).
+    If RBT is used, then searching an element would take at the most O(log n).
+    In LinkedList, insertion would happen at the beginning of the LinkedList, so it would take O(1), but insertion in RBT may take O(log n) in worst case.
+
+    'compute' methods are just like replace method with slight variations.
+    If you see carefully, replace method doesn’t care whether existing value of a key is null or non-null, but compute methods does care about it. Compute methods will remove the key, if new computed value is null.
+
+    - map.replace("1", "one-new")
+      If key="1" exists with null/non-null value, then only it replaces its value. It doesn't create a new key "1", if it doesn't exist
+
+    - map.replace("1", "one", "one-new")
+      Replaces the value of a key "1" to "one-new", if current value matches to "one"
+
+    - map.compute("1", (k, v) -> "value of "+k)
+      It creates a key, if it doesn’t exist, otherwise it replaces computed value. If computed value is null, then it removes the key, if it exists already.
+
+    - map.computeIfAbsent("4", (k) -> k + "-new")
+      If key doesn't exist or value of the key is null, then insert a key with computed value, if computed value is not null.
+
+    - map.computeIfPresent("3", (k, v) -> v + "-new computed value")
+      If key exist and its value is not null, then replace that value with new computed value. If computed value is null, then it removes the key.
+
+
+    - map.forEach((k, v) -> System.out.format("%s's value is %s\n", k, v))
+
+    - map.putIfAbsent("5", "five")
+      Adds key-value to a map, if key doesn't exist in the map, if key exist then do nothing
+
+    - map.merge("Key1","Value56",(v1,v2)->v1.concat(v2)); v1 is is the existing value of Key1, v1 will be merged with 'Value56'.
+      Merge the specified value to the existing Value using the Specified function for the Specified Key.
+
+
+ForkAndJoin Strategy & ForkJoinPool
+
+    Java's Parallelism is based on ForkAndJoin strategy + ForkJoinPool(uses Work Stealing Algorithm).
+
+    ForkAndJoin strategy - Forking subtasks from tasks and merging the results from subtasks to complete the task. Java 8 uses Spliterator to fork the task into subtasks.
+    ForkJoinPool - It's an implementation of the ExecutorService interface, which distributes subtasks of tasks to worker threads in a thread pool, called ForkAndJoinPool.
+                   It is based on Work Stealing Algorithm.
+                   When you submit a task using asynchronously using CompletableFuture, by default it uses ForkJoinPool's Common Pool.
+                   Common Pool is nothing but the pool of threads (available processors) shared by all JVM tasks. Sometimes, it's better to use another variation of ExecutorService that provides fixedThreadPool because using Common Pool for your tasks are shared by JVM tasks.
+
+    In Work Stealing Algorithm, each thread in the pool is assigned its doubly linked list queue. When one thread finishes its task and if its queue is empty, it steals the task from some other thread's queue.
+    This work stealing is required because in ForkAndJoin strategy, parent task is not completed until all its subtasks are completed and joined.
+
+CompletableFuture
+
+        Future<T>           CompletionStage<T>
+            |                       |
+            -------------------------
+                        |
+
+                CompletableFuture<T>
+
+    CompletableFuture is the best example of setting the callbacks that depends on the availability and nature of the result set inside the future object by its related task.
+    By default, its async methods use ExecutorService of type ForkJoinPool and uses it common thread pool which is shared by all JVM tasks and parallel streams. If you want to pass your own ExecutorService, you can do that too.
+
+    (IMP)
+    You can create may async tasks and then you can wait for any or all of them to be completed and do something with the result of them.
+    This is kind of creating your own Parallelism.
+
+    Future interface has get() method
+    It's a blocking method. CompletionStage provides many methods that can run without blocking and they react when result (completed value) is available in CompletedFuture.
+
+    see Java8CompletableFutureExample.java
+
+Date And Time Enhancements
+
+    see Java8DateAndTimeAPIEnhancementExample.java
+
+Method References
+
+
+
+default method

@@ -1,0 +1,151 @@
+Recursion, Tail-Recursion, CoRecursion, Memoization
+
+    Recursion vs Corecursion:
+
+            Basically, corecursion is recursion accumulator-style, building its result on the way forward from the starting case, whereas regular recursion builds its result on the way back from the base case.
+
+            Tail-Recursion:
+            Tail recursion is a special kind of recursion where the recursive call is the very tail thing in the function. It's a function that does not do anything at all after recursing.
+            Tail-Recursion needs to follow the principle of Corecursion to have the recursive call very tail thing in the function.
+
+            public static int factorialRecursive(int n) {
+                if(n == 0) return 0;
+                if(n == 1) return n;
+                return n * factorialRecursive(n-1);  // This is not Tail-Recursion because calling the recursive method is not the tail thing to do. Its result needs to be multiplied with something.
+            }
+
+
+            public static int factorialTailRecursive(int n, int result) {
+                if(n == 0) return 0;
+                if(n == 1) return result;
+                return factorialTailRecursive(n - 1, result * n); // This is Tail-Recursive and also Corecursive
+            }
+
+    You have memoized the result in a result variable at every step of recursion.
+    Even though, it uses extra heap space to carry over result for each recursive call, it is better to do that because you can use a TailCall class (will be described later) to use single stack frame on Corecursive method.
+    See Memoizer.java and MemoizerDemo.java for better understanding of Memoization.
+
+'this' inside anonymous class vs lambda:
+
+    'this' inside anonymous class refers to that anonymous class' instance. You can access that anonymous class' members using 'this'.
+    'this' inside lambda refers to enclosing class' instance. You can access enclosing class' members using 'this'.
+
+
+foldLeft method
+
+	static O foldLeft(Stream<I> inputStream, O identity, Function<I, Function<O,O>> operation) {
+		if(inputStream == null || inputStream.isEmpty()) return identity;
+
+		O newIdentity = operation.apply(inputStream.head()).apply(identity);
+
+		return foldLeft(inputStream.tail(), newIdentity, operation);
+	}
+
+	// evaluating output lazily using Supplier
+	static O foldLeft(Stream<I> inputStream, Supplier<O> identity, Function<I, Function<Supplier<O>,O>> operation)
+
+	// avoiding recursion in recursive method and using single stack frame
+	static TailCall<O> foldLeft(Stream<I> inputStream, O identity, Function<I, Function<O,O>> operation)
+
+foldRight method
+
+    static O foldRight(Stream<I> inputStream, O identity, Function<I, Function<O,O>> operation) {
+        return foldLeft(inputStream.reverse(), identity, operation);
+    }
+
+reverse method
+
+    Stream<I> reverse() {
+        Stream<I> identityStream = empty();
+        return foldLeft(this, identityStream, thisStreamEle->identityStream->new Cons(currentStreamEle,identityStream));
+    }
+
+map method
+
+	Stream<O> map(Function<I, O> operation) {
+		Stream<O> identityStream = empty();
+
+		return foldRight(this, identityStream, inputStreamEle->identityStream->new Cons(operation.apply(inputStreamEle), identityStream)
+	}
+
+flatMap method
+
+	Stream<O> flatMap(Function<I, Stream<O>> operation) {
+		Stream<O> identityStream = empty();
+
+		return foldRight(this, identityStream, inputStreamEle->identityStream->operation.apply(inputStreamEle).append(identityStream))
+	}
+
+append method
+
+	Stream<O> append(Stream<I> streamToBeAppendedToCurrentStream) {
+		return foldRight(this, streamToBeAppendedToCurrentStream, inputStreamEle->identityStream->new Cons(inputStreamEle, identityStream));
+	}
+
+iterate method
+
+    public static <A> Stream<A> iterate(A seed, Function<A, A> f) {
+        return cons(seed, () -> iterate(f.apply(seed), f));
+    }
+    public static <A> Stream<A> iterateUsingUnfold(A seed, Function<A, A> f) {
+        return unfold(seed, f, s -> s);
+    }
+
+
+unfold method
+
+    fold method iterates through a stream/list/tree etc and creates an output based on passed startInputIdentity.
+    unfold method is reverse. It creates a stream/list/tree etc from passed startInputIdentity value.
+
+    // My own version 1 of unfold method.
+    // unfold method is normally used for creating a Stream for infinite input, which will force you to wrap recursive call with Supplier.
+    public static <A, S> Stream<A> unfold(S startInputIdentity, // S means start
+                                          Function<S, S> nextS,
+                                          Function<S, A> f) { // used to create Stream's head by converting S to A
+
+        return Stream.cons(
+                f.apply(startInputIdentity),
+                () -> unfold(nextS.apply(startInputIdentity), nextS, f)
+        );
+    }
+
+    // My own version of unfold method, it is easier for me to understand.
+    // you can not supply endInputIdentity all the time, if you really want unfold method to be called infinitely.
+    // See TestReader.java's unfold method usage.
+    public static <A, S> Stream<A> unfold1(S startInputIdentity, // S means start
+                                           S endInputIdentity, // tail element of the stream. It is used to stop creating more elements in the stream. If this is not there, it will result in infinite stream.
+                                           Function<S, S> nextS, // used to get next element for the stream
+                                           Function<S, A> f, // used to create Stream's head by converting S to A
+                                           Stream<A> outputIdentity) {
+
+        if (startInputIdentity.equals(endInputIdentity))
+            return Stream.cons(f.apply(startInputIdentity), outputIdentity); // there is an exit condition, so unfold1 is not going to be called infinitely. So, there is no need to wrap Cons' tail with Supplier.
+
+        return unfold1(
+                nextS.apply(startInputIdentity),
+                endInputIdentity,
+                nextS,
+                f,
+                Stream.cons(f.apply(startInputIdentity), outputIdentity)
+        );
+    }
+
+    // extracting out exit condition as a Function
+    // I got this idea from Chapter 3's unfold method
+    public static <A, S> Stream<A> unfold2(S startInputIdentity, // S means start
+                                           Function<S, Boolean> exitCondition,
+                                           Function<S, S> nextS,
+                                           Function<S, A> f, // used to create Stream's head by converting S to A
+                                           Stream<A> outputIdentity) {
+
+        if (exitCondition.apply(startInputIdentity))
+            return Stream.cons(f.apply(startInputIdentity), outputIdentity); // there is an exit condition, so unfold1 is not going to be called infinitely. So, there is no need to wrap Cons' tail with Supplier.
+
+        return unfold2(
+                nextS.apply(startInputIdentity),
+                exitCondition,
+                nextS,
+                f,
+                Stream.<A>cons(f.apply(startInputIdentity), outputIdentity)
+        );
+    }
