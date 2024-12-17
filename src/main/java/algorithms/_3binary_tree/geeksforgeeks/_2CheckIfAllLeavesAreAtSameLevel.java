@@ -19,6 +19,58 @@ import java.util.List;
 public class _2CheckIfAllLeavesAreAtSameLevel {
 
     public static void main(String[] args) {
+
+        TreeNode one = createTree();
+
+        System.out.print("Input Binary Tree:");
+        TreeUtils.printPreety(one);
+
+        _2CheckIfAllLeavesAreAtSameLevel obj = new _2CheckIfAllLeavesAreAtSameLevel();
+
+        System.out.println("Approach 1.................");
+        one = createTree();
+        {
+            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
+            System.out.println("Result: " + result); // true
+        }
+        {
+            one.right.right.left = null; // seven.left=null
+            one.right.right.right = null; // seven.right=null
+            TreeUtils.printPreety(one);
+            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
+            System.out.println("Result: " + result); // false
+        }
+        System.out.println("Approach 2.................");
+        one = createTree();
+        {
+
+            boolean result = checkLeafNodes2(one, 0, -1);
+            System.out.println("Result: " + result); // true
+        }
+        {
+            one.right.right.left = null; // seven.left=null
+            one.right.right.right = null; // seven.right=null
+            TreeUtils.printPreety(one);
+            boolean result = checkLeafNodes2(one, 0, -1);
+            System.out.println("Result: " + result); // false
+        }
+
+         /*
+         System.out.println("Approach 3.................");
+         one = createTree();
+        {
+            boolean result = obj.check(one, 0);
+            System.out.println("Result: " + result);// true
+        }
+
+        {
+            seven.right = null;
+
+            boolean result = obj.check(one, 0);
+            System.out.println("Result: " + result);// false
+        }*/
+    }
+    private static TreeNode createTree() {
         TreeNode one = new TreeNode(1);
         TreeNode two = new TreeNode(2);
         TreeNode three = new TreeNode(3);
@@ -51,35 +103,8 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
         six.right = twelve;
 
         seven.right = thirteen;
-
-        System.out.print("Input Binary Tree:");
-        TreeUtils.printPreety(one);
-
-        _2CheckIfAllLeavesAreAtSameLevel obj = new _2CheckIfAllLeavesAreAtSameLevel();
-
-        /*{
-            boolean result = obj.check(one, 0);
-            System.out.println("Result: " + result);// true
-        }
-
-        {
-            seven.right = null;
-
-            boolean result = obj.check(one, 0);
-            System.out.println("Result: " + result);// false
-        }*/
-
-        {
-            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
-            System.out.println("Result: " + result); // true
-        }
-        {
-            seven.right = null;
-            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
-            System.out.println("Result: " + result); // false
-        }
+        return one;
     }
-
 
     /*
         Do not get confused seeing level passed in method. It alone doesn't make this traversal as level order traversal.
@@ -115,7 +140,7 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
         return areAllLeafNodesInLeftSubTreeAreAtSameLevel;
     }
 
-    private boolean isLeaf(TreeNode root) {
+    private static boolean isLeaf(TreeNode root) {
         return root != null && root.left == null && root.right == null;
     }
 
@@ -124,7 +149,7 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
             return true;
         }
         if(root.left != null) {
-            if(root.left.left == null && root.left.right == null) {
+            if(isLeaf(root.left)) {
                 levels.add(level+1);
             }
         }
@@ -135,7 +160,7 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
         boolean left = checkLeafNodes(root.left, level+1, levels);
 
         if(root.right != null) {
-            if(root.right.left == null && root.right.right == null) {
+            if(isLeaf(root.right)) {
                 levels.add(level+1);
             }
         }
@@ -158,5 +183,48 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
             }
         }
         return true;
+    }
+    private static boolean checkLeafNodes2(TreeNode root, int level, int prevLeafLevel) {
+        if(root == null || (root.left == null && root.right == null)) {
+            prevLeafLevel = level;
+            return true;
+        }
+        level++;
+        TreeNode node = root.left;
+        //boolean leftNull = true;
+        if(node != null) {
+            //leftNull = false;
+            //level = level+1;
+            if(isLeaf(node)) {
+                if (prevLeafLevel != -1) {
+                    if (prevLeafLevel != level) {
+                        return false;
+                    }
+                } else {
+                    prevLeafLevel = level;
+                }
+
+            } /*else {
+                prevLeafLevel = level;
+            }*/
+        }
+        node = root.right;
+        if(node != null) {
+            //if(leftNull) {
+                //level = level+1;
+            //}
+            if(isLeaf(node)) {
+                if (prevLeafLevel != -1) {
+                    if (prevLeafLevel != level) {
+                        return false;
+                    }
+                } else {
+                    prevLeafLevel = level;
+                }
+            }/* else {
+                prevLeafLevel = level;
+            }*/
+        }
+        return checkLeafNodes2(root.left, level, prevLeafLevel) && checkLeafNodes2(root.right, level, prevLeafLevel);
     }
 }
