@@ -3,6 +3,9 @@ package algorithms._3binary_tree.geeksforgeeks;
 import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
 import algorithms.utils.TreeUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
     Check if all leaves are at same level
 
@@ -54,7 +57,7 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
 
         _2CheckIfAllLeavesAreAtSameLevel obj = new _2CheckIfAllLeavesAreAtSameLevel();
 
-        {
+        /*{
             boolean result = obj.check(one, 0);
             System.out.println("Result: " + result);// true
         }
@@ -64,9 +67,17 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
 
             boolean result = obj.check(one, 0);
             System.out.println("Result: " + result);// false
+        }*/
+
+        {
+            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
+            System.out.println("Result: " + result); // true
         }
-
-
+        {
+            seven.right = null;
+            boolean result = checkLeafNodes(one, 0, new ArrayList<>());
+            System.out.println("Result: " + result); // false
+        }
     }
 
 
@@ -106,5 +117,46 @@ public class _2CheckIfAllLeavesAreAtSameLevel {
 
     private boolean isLeaf(TreeNode root) {
         return root != null && root.left == null && root.right == null;
+    }
+
+    private static boolean checkLeafNodes(TreeNode root, int level, List<Integer> levels) {
+        if(root == null || (root.left == null && root.right == null)) {
+            return true;
+        }
+        if(root.left != null) {
+            if(root.left.left == null && root.left.right == null) {
+                levels.add(level+1);
+            }
+        }
+        if(!checkAllLevelsSame(levels)) {
+            return false;
+        }
+
+        boolean left = checkLeafNodes(root.left, level+1, levels);
+
+        if(root.right != null) {
+            if(root.right.left == null && root.right.right == null) {
+                levels.add(level+1);
+            }
+        }
+        if(!checkAllLevelsSame(levels)) {
+            return false;
+        }
+
+        boolean right = checkLeafNodes(root.right, level+1, levels);
+
+        return left && right;
+    }
+    private static boolean checkAllLevelsSame(List<Integer> leafLevels) {
+        if(leafLevels.size() == 0 || leafLevels.size() == 1) {
+            return true;
+        }
+        int first = leafLevels.get(0);
+        for (Integer leafLevel : leafLevels) {
+            if(leafLevel != first) {
+                return false;
+            }
+        }
+        return true;
     }
 }
