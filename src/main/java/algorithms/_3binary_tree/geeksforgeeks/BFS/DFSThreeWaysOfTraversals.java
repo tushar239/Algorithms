@@ -1,4 +1,4 @@
-package algorithms._3binary_tree.geeksforgeeks.DFS;
+package algorithms._3binary_tree.geeksforgeeks.BFS;
 
 import algorithms._3binary_tree.geeksforgeeks.BinaryTree;
 import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
