@@ -95,7 +95,8 @@ Tree:
 
     Depth-First Traversal (DFS) (https://www.youtube.com/watch?v=gm8DUJJhmY4)
 
-        DFS traverses the tree while giving priority to the depth(height) of the tree. It is called Depth-First instead of more logical 'Height-First'.
+        DFS traverses the tree while giving priority to the depth(height) of the tree.
+        It is called Depth-First instead of more logical 'Height-First'.
 
         -   Pre-Order Traversal
         -   In-Order Traversal  ----- Always traverses nodes of BST(Binary Search Tree which is symmetric) in ASCENDING order

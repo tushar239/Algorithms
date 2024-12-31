@@ -5,12 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c7040e2-ac40-4a90-830b-70f100dcde14" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/algorithms/_3binary_tree/geeksforgeeks/BFS/BFSLevelOrderTraversal.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/algorithms/_3binary_tree/geeksforgeeks/DFS/DFSThreeWaysOfTraversals.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/algorithms/_0Fundamentals/Tree/TreeFundamentals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/algorithms/_0Fundamentals/Tree/TreeFundamentals.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,7 +54,33 @@
       <recent name="D:\Projects\Algorithms\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application._1_1ReverseBinaryTreePath">
+  <component name="RunManager" selected="Application.BFSLevelOrderTraversal">
+    <configuration name="BFSLevelOrderTraversal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.BFS.BFSLevelOrderTraversal" />
+      <module name="Algorithms" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.BFS.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DFSThreeWaysOfTraversals" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.DFS.DFSThreeWaysOfTraversals" />
+      <module name="Algorithms" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.DFS.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="_1_1ReverseBinaryTreePath" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks._1_1ReverseBinaryTreePath" />
       <module name="Algorithms" />
@@ -73,6 +109,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.BFSLevelOrderTraversal" />
+        <item itemvalue="Application.DFSThreeWaysOfTraversals" />
         <item itemvalue="Application._1_1ReverseBinaryTreePath" />
         <item itemvalue="Application._2CheckIfAllLeavesAreAtSameLevel" />
       </list>
