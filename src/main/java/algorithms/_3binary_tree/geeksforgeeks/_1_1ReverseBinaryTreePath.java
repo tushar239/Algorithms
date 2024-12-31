@@ -109,7 +109,7 @@ public class _1_1ReverseBinaryTreePath {
         boolean foundInLeftSubTree = reverseTreePath(root.left, visited, element);
         boolean foundInRightSubTree = false;
         if (!foundInLeftSubTree) {
-            foundInRightSubTree = reverseTreePath(root.left, visited, element);
+            foundInRightSubTree = reverseTreePath(root.right, visited, element);
         }
 
         if (foundInLeftSubTree || foundInRightSubTree) {

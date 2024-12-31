@@ -82,7 +82,7 @@ public class _1_2ReverseBinarySearchTreePath {
             return false;
         }
 
-        boolean foundInRightSubTree = reverseTreePath(root.left, visited, element);
+        boolean foundInRightSubTree = reverseTreePath(root.right, visited, element);
 
         if (foundInRightSubTree) {
             root.data = visited.remove(0);
