@@ -68,7 +68,7 @@ public class DFSThreeWaysOfTraversals {
         }
     }
     public static void traversePostOrderWithoutRecursion(BinaryTree binaryTree) {
-        Stack<TreeNode> stack = new Stack<TreeNode>();
+        Stack<TreeNode> stack = new Stack<>();
         TreeNode root = binaryTree.getRoot();
         TreeNode prev = root;
         TreeNode current = root;

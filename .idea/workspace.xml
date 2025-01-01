@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c7040e2-ac40-4a90-830b-70f100dcde14" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/algorithms/_3binary_tree/geeksforgeeks/BFS/BFSLevelOrderTraversal.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/algorithms/_3binary_tree/geeksforgeeks/DFS/DFSThreeWaysOfTraversals.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/algorithms/_0Fundamentals/Tree/TreeFundamentals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/algorithms/_0Fundamentals/Tree/TreeFundamentals.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,11 +53,11 @@
   </component>
   <component name="RunManager" selected="Application.BFSLevelOrderTraversal">
     <configuration name="BFSLevelOrderTraversal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.BFS.BFSLevelOrderTraversal" />
+      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.DFS.BFSLevelOrderTraversal" />
       <module name="Algorithms" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.BFS.*" />
+          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.DFS.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -69,11 +66,11 @@
       </method>
     </configuration>
     <configuration name="DFSThreeWaysOfTraversals" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.DFS.DFSThreeWaysOfTraversals" />
+      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.BFS.DFSThreeWaysOfTraversals" />
       <module name="Algorithms" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.DFS.*" />
+          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.BFS.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
