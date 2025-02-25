@@ -1,6 +1,6 @@
 package algorithms._3binary_tree.geeksforgeeks.BFS._1level_order_vertical_order_diagonal_order_traversal_related_algorithms;
 
-import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
+import algorithms.utils.TreeNode;
 import algorithms.utils.TreeUtils;
 
 import java.util.PriorityQueue;

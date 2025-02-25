@@ -1,4 +1,4 @@
-package algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses;
+package algorithms.utils;
 
 /**
  * @author Tushar Chokshi @ 8/27/15.

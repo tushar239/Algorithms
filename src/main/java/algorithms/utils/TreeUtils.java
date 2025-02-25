@@ -1,7 +1,5 @@
 package algorithms.utils;
 
-import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
-
 import java.util.ArrayList;
 import java.util.List;
 

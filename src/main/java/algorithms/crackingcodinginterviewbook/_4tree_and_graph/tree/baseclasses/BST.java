@@ -1,5 +1,7 @@
 package algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses;
 
+import algorithms.utils.TreeNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;

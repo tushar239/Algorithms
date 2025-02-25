@@ -1,7 +1,7 @@
 package algorithms._3binary_tree.geeksforgeeks.DFS;
 
 import algorithms._3binary_tree.geeksforgeeks.BinaryTree;
-import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
+import algorithms.utils.TreeNode;
 import algorithms.utils.TreeUtils;
 import com.google.common.collect.Lists;
 

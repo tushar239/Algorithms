@@ -1,7 +1,7 @@
 package algorithms.crackingcodinginterviewbook._4tree_and_graph.tree;
 
 import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.BST;
-import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.TreeNode;
+import algorithms.utils.TreeNode;
 
 import java.util.Stack;
 
