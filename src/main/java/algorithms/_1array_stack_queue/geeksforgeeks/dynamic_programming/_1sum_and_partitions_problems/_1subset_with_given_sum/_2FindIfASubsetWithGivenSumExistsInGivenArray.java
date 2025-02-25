@@ -410,8 +410,26 @@ public class _2FindIfASubsetWithGivenSumExistsInGivenArray {
 
         Using Dynamic Programming, you can reduce time complexity to O(sum * n). Basically, when you draw 2-D matrix, you need to fill up sum*A.length cells.
     */
+    private static boolean isSubsetSum_BruteForce1(int[] a, int start, int end , int sum) {
+        if(start == end) {
+            if (sum == a[start]) {
+                return true;
+            }
+            return false;
+        }
+        int element = a[start];
+        if(element == sum) {
+            return true;
+        }
+        if(element > sum) {
+            boolean exists = isSubsetSum_BruteForce1(a, start+1, end, sum);
+            return exists;
+        }
+        return isSubsetSum_BruteForce1(a, start+1, end, sum) ||
+                isSubsetSum_BruteForce1(a, start+1, end, sum-element);
+    }
     @SuppressWarnings("Duplicates")
-    private static boolean isSubsetSum_BruteForce(int[] A, int start, int end, int sum) {
+    private static boolean isSubsetSum_BruteForce2(int[] A, int start, int end, int sum) {
         //System.out.println("end="+end+", sum="+sum);
 
         if (A == null || A.length == 0) {
@@ -436,7 +454,7 @@ public class _2FindIfASubsetWithGivenSumExistsInGivenArray {
             return true;
         }
 
-        boolean withoutEndElement = isSubsetSum_BruteForce(A, start, end - 1, sum);
+        boolean withoutEndElement = isSubsetSum_BruteForce2(A, start, end - 1, sum);
 
         if (element > sum) {
             return withoutEndElement;
@@ -444,7 +462,7 @@ public class _2FindIfASubsetWithGivenSumExistsInGivenArray {
 
         // excluding current element || including current element
         return withoutEndElement ||
-                isSubsetSum_BruteForce(A, start, end - 1, sum - element);
+                isSubsetSum_BruteForce2(A, start, end - 1, sum - element);
 
     }
 
