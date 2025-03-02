@@ -3,10 +3,8 @@ package algorithms.crackingcodinginterviewbook._4tree_and_graph.tree;
 import algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.baseclasses.BST;
 import algorithms.utils.TreeNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static algorithms.utils.TreeUtils.printPreety;
 
@@ -29,7 +27,10 @@ public class _2CreateLinkedListForEachLevelOfBinaryTree {
     public static void main(String[] args) {
         BST bst = BST.createBST();
         printPreety(bst.root);
-
+        {
+            levelOrdering2(bst.root);
+        }
+        System.out.println("----------------------");
         {
             Map<Integer, List<Integer>> levelOrderedLists = levelOrdering(bst.root, 0);
             for (Integer level : levelOrderedLists.keySet()) {
@@ -37,7 +38,7 @@ public class _2CreateLinkedListForEachLevelOfBinaryTree {
             }
         }
 
-        System.out.println();
+        System.out.println("----------------------");
         System.out.println("Improved algorithm.....");
         {
             HashMap<Integer, List<Integer>> levelOrderedLists = new HashMap<>();
@@ -120,5 +121,29 @@ public class _2CreateLinkedListForEachLevelOfBinaryTree {
         levelOrdering_Improved(root.right, level + 1, result);
 
     }
+    private static void levelOrdering2(TreeNode root){
+        Queue<TreeNode> queue = new LinkedBlockingQueue<>();
+        queue.add(root);
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            List<TreeNode> list = new LinkedList<>();
+            for(int i=1; i<=size; i++) {
+                TreeNode polledNode = queue.poll();
+                list.add(polledNode);
+
+                TreeNode left = polledNode.left;
+                if(left != null) {
+                    queue.add(left);
+                }
+                TreeNode right = polledNode.right;
+                if(right != null) {
+                    queue.add(right);
+                }
+            }
+            System.out.println(list);
+
+        }
+    }
+
 
 }

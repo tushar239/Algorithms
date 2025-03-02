@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c7040e2-ac40-4a90-830b-70f100dcde14" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/swing/JLabelDemo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/algorithms/crackingcodinginterviewbook/_4tree_and_graph/tree/_2CreateLinkedListForEachLevelOfBinaryTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/algorithms/crackingcodinginterviewbook/_4tree_and_graph/tree/_2CreateLinkedListForEachLevelOfBinaryTree.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +53,7 @@
       <recent name="D:\Projects\Algorithms\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.BFSLevelOrderTraversal">
+  <component name="RunManager" selected="Application.JLabelDemo">
     <configuration name="BFSLevelOrderTraversal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks.DFS.BFSLevelOrderTraversal" />
       <module name="Algorithms" />
@@ -78,6 +80,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="JLabelDemo" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="swing.JLabelDemo" />
+      <module name="Algorithms" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="swing.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="_1_1ReverseBinaryTreePath" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks._1_1ReverseBinaryTreePath" />
       <module name="Algorithms" />
@@ -91,12 +106,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="_2CheckIfAllLeavesAreAtSameLevel" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="algorithms._3binary_tree.geeksforgeeks._2CheckIfAllLeavesAreAtSameLevel" />
+    <configuration name="_2CreateLinkedListForEachLevelOfBinaryTree" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="algorithms.crackingcodinginterviewbook._4tree_and_graph.tree._2CreateLinkedListForEachLevelOfBinaryTree" />
       <module name="Algorithms" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithms._3binary_tree.geeksforgeeks.*" />
+          <option name="PATTERN" value="algorithms.crackingcodinginterviewbook._4tree_and_graph.tree.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -106,10 +121,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.JLabelDemo" />
+        <item itemvalue="Application._2CreateLinkedListForEachLevelOfBinaryTree" />
         <item itemvalue="Application.BFSLevelOrderTraversal" />
         <item itemvalue="Application.DFSThreeWaysOfTraversals" />
         <item itemvalue="Application._1_1ReverseBinaryTreePath" />
-        <item itemvalue="Application._2CheckIfAllLeavesAreAtSameLevel" />
       </list>
     </recent_temporary>
   </component>
