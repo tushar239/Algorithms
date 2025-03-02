@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 // https://www.tutorialspoint.com/swing/index.htm
-public class JLabelDemo {
+public class SwingDemo {
     private static JLabel statusLabel;
     public static void main(String[] args) {
         JFrame mainFrame = createFrame();
@@ -19,7 +19,8 @@ public class JLabelDemo {
     private static JFrame createFrame() {
         JFrame mainFrame = new JFrame("Java Swing Examples");
         mainFrame.setSize(400,400);
-        mainFrame.setLayout(new GridLayout(3, 1));
+        //mainFrame.setLayout(new GridLayout(3, 1));
+        mainFrame.setLayout(new CardLayout());
 
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent){
@@ -30,9 +31,9 @@ public class JLabelDemo {
     }
 
     private static JPanel createControlPanel(JFrame mainFrame) {
-        JPanel controlPanel = new JPanel(new BorderLayout());
-        controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        //controlPanel.setLayout(new BorderLayout());
+        JPanel controlPanel = new JPanel();
+        //controlPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        controlPanel.setLayout(new GridLayout(10,1));
         mainFrame.add(controlPanel);
         return controlPanel;
     }
