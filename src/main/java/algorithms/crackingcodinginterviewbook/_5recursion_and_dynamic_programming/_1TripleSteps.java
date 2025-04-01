@@ -215,7 +215,7 @@ public class _1TripleSteps {
         int minusTwo = totalSteps_BruteForce(stairs - 2);
 
         // in reality, if you are finding ways to climb n stairs with 3 steps
-        // then you need to find ways to climb n-3 stairs and add 3 to each of those ways
+        // then you need to find ways to climb n-3 stairs and add 4 to each of those ways
         // it doesn't change total number of ways. so just finding number of ways to climb n-1 stairs is enough.
         int minusThree = totalSteps_BruteForce(stairs - 3);
         return minusOne + minusTwo + minusThree;

@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c7040e2-ac40-4a90-830b-70f100dcde14" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/swing/CardLayoutDemo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/swing/JLabelDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/swing/SwingDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/algorithms/crackingcodinginterviewbook/_5recursion_and_dynamic_programming/_1TripleSteps.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/algorithms/crackingcodinginterviewbook/_5recursion_and_dynamic_programming/_1TripleSteps.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +44,8 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Projects/Algorithms/src/main/java&quot;
+    &quot;last_opened_file_path&quot;: &quot;D:/Projects/Algorithms/src/main/java&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
 }</component>
   <component name="RecentsManager">
